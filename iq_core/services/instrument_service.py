@@ -168,7 +168,10 @@ class InstrumentService:
         if filter_by is not None:
             filter_lower = str(filter_by).lower()
             instruments = [
-                i for i in instruments if str(i.id) == filter_lower or i.symbol.lower() == filter_lower
+                i for i in instruments
+                if filter_lower in str(i.id).lower()
+                or filter_lower in i.symbol.lower()
+                or filter_lower in i.name.lower()
             ]
 
         instruments = instruments[offset : offset + limit] if limit is not None else instruments[offset:]
