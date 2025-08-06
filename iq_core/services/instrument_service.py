@@ -63,6 +63,15 @@ class InstrumentService:
         self._raw_groups: dict[str, str] = {}
         self._binary_raw: dict | None = None
         self._digital_raw: dict | None = None
+        self._instruments: list[Instrument] = []
+
+    def __iter__(self):
+        """
+        🇧🇷 Retorna um iterador para os instrumentos carregados.
+
+        🇺🇸 Returns an iterator over the loaded instruments.
+        """
+        return iter(self._instruments)
 
     @measure_time
     async def fetch(
@@ -96,7 +105,7 @@ class InstrumentService:
         Raises:
             IQOptionError: Se a resposta do WebSocket for nula ou inválida.
         """
-        binary_resp, digital_resp, _ = await asyncio.gather(
+        binary_response, digital_response, _ = await asyncio.gather(
             self._ws.request({"name": "get-initialization-data", "version": "4.0"}),
             self._ws.request({
                 "name": "digital-option-instruments.get-underlying-list",
@@ -105,16 +114,16 @@ class InstrumentService:
             }),
             self._fetch_profits(),
         )
-        if binary_resp is None:
+        if binary_response is None:
             raise IQOptionError("InstrumentService.fetch(): resposta WebSocket nula")
 
-        self._binary_raw = binary_resp
-        self._digital_raw = digital_resp
-        self._raw_groups = binary_resp.get("groups", {})
+        self._binary_raw = binary_response
+        self._digital_raw = digital_response
+        self._raw_groups = binary_response.get("groups", {})
 
         raw_data: dict[int, dict] = {}
         for key in ("binary", "blitz", "turbo"):
-            raw_data.update(binary_resp.get(key, {}).get("actives", {}))
+            raw_data.update(binary_response.get(key, {}).get("actives", {}))
 
         now_ts = int(datetime.now(timezone.utc).timestamp())
 
@@ -175,6 +184,7 @@ class InstrumentService:
             ]
 
         instruments = instruments[offset : offset + limit] if limit is not None else instruments[offset:]
+        self._instruments = instruments
         return instruments[0] if filter_by is not None and instruments else instruments or []
 
     async def _fetch_profits(self) -> None:
@@ -185,7 +195,7 @@ class InstrumentService:
         """
         async def fetch(inst_type: InstrumentType) -> tuple[str, dict[int, float]]:
             try:
-                resp = await self._ws.request(
+                response = await self._ws.request(
                     {
                         "name": "trading-settings.get-trading-group-params",
                         "version": "2.0",
@@ -195,12 +205,12 @@ class InstrumentService:
                 if inst_type == InstrumentType.DIGITAL:
                     profits = {
                         sp["active_id"]: sp.get("profit", 0.0)
-                        for sp in resp.get("spot_profits", [])
+                        for sp in response.get("spot_profits", [])
                     }
                 else:
                     profits = {
                         sp["active_id"]: 100.0 - sp.get("value", 0.0)
-                        for sp in resp.get("commissions", [])
+                        for sp in response.get("commissions", [])
                     }
                 return inst_type.value, profits
             except Exception as e:
