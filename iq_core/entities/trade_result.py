@@ -33,7 +33,7 @@ class TradeResult:
     result: TradeResultType
     invest: Decimal
     profit: Decimal
-    pnl: float
+    pnl: Decimal
     open: float
     close: float
     open_time: int
@@ -52,12 +52,12 @@ class TradeResult:
     def from_dict(cls, data: dict[str, Any]) -> "TradeResult":
         raw_event = data.get("raw_event", {}).get("binary_options_option_changed1", {})
         return cls(
-            id=data.get("external_id"),
+            id=data.get("external_id", 0),
             status=TradeStatus(data.get("status")),
             result=TradeResultType(raw_event.get("result")),
             invest=Decimal(str(data.get("invest", "0.0"))),
             profit=Decimal(str(data.get("close_profit", "0.0"))),
-            pnl=float(data.get("pnl", 0.0)),
+            pnl=Decimal(str(data.get("pnl", 0.0))),
             open=float(data.get("open_quote", 0.0)),
             close=float(data.get("close_quote", 0.0)),
             open_time=int(data.get("open_time", 0)),
