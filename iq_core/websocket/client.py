@@ -302,7 +302,7 @@ class WebSocketClient:
             else:
                 return data
         except asyncio.TimeoutError:
-            logger.warning(f"Timeout waiting for response to '{name or request_id}'")
+            logger.debug(f"Timeout waiting for response to '{name or request_id}'")
             return None
         finally:
             if request_id:
@@ -559,59 +559,48 @@ class WebSocketClient:
         🇧🇷 Calcula a expiração ideal para a duração informada,
         usando o horário atual do servidor como referência.
 
-        📋 Parâmetros:
-        - duration (int): Duração desejada em minutos.
-
-        📤 Retorna:
-        - tuple[int, int]: Timestamp da expiração (epoch seconds) e índice.
-
-        ⚠️ Exceções:
-        - TradingError: Se não encontrar expiração segura.
-
         🇺🇸 Calculates the ideal expiration for the given duration,
         using the current server time as reference.
 
-        📋 Parameters:
-        - duration (int): Desired duration in minutes.
+        Args:
+            duration (int): 
+                🇧🇷 Duração desejada em minutos.  
+                🇺🇸 Desired duration in minutes.
 
-        📤 Returns:
-        - tuple[int, int]: Expiration timestamp (epoch seconds) and index.
+        Returns:
+            tuple[int, int]: 
+                🇧🇷 Timestamp da expiração (em segundos) e índice na lista.  
+                🇺🇸 Expiration timestamp (epoch seconds) and index.
 
-        ⚠️ Raises:
-        - TradingError: If no safe expiration is found.
+        Raises:
+            TradingError: 
+                🇧🇷 Se não encontrar expiração segura.  
+                🇺🇸 If no safe expiration is found.
         """
-        def date_to_timestamp(dt: datetime) -> int:
-            return int(mktime(dt.timetuple()))
+        current_time = datetime.fromtimestamp(self.current_server_time(ms=False))
+        timestamps = []
 
-        server_timestamp = self.current_server_time(ms=False)
-        now_date = datetime.fromtimestamp(server_timestamp)
+        if current_time.second < 30:
+            base_minute = current_time.replace(second=0, microsecond=0)
+        else:
+            base_minute = current_time.replace(second=0, microsecond=0) + timedelta(minutes=1)
 
-        expirations = []
-
-        next_minute = now_date.replace(second=0, microsecond=0) + timedelta(minutes=1)
         for i in range(5):
-            expirations.append(date_to_timestamp(next_minute + timedelta(minutes=i)))
+            timestamps.append(int((base_minute + timedelta(minutes=i + 1)).timestamp()))
 
-        search_date = next_minute + timedelta(minutes=4)
-        search_date = search_date.replace(second=0, microsecond=0)
-        while len(expirations) < 55:
-            if search_date.minute % 15 == 0 and search_date > now_date:
-                expirations.append(date_to_timestamp(search_date))
-            search_date += timedelta(minutes=1)
-
+        temp_date = current_time.replace(second=0, microsecond=0)
+        count = 0
+        while count < 50:
+            temp_date += timedelta(minutes=1)
+            if temp_date.minute % 15 == 0 and (temp_date - current_time).total_seconds() > 300:
+                timestamps.append(int(temp_date.timestamp()))
+                count += 1
+        
         target_seconds = duration * 60
+        differences = [abs(t - (time() + target_seconds)) for t in timestamps]
+        closest_index = differences.index(min(differences))
 
-        safe_expirations = [exp for exp in expirations if exp > server_timestamp]
-        if not safe_expirations:
-            raise TradingError("No safe expiration found.")
-
-        closest_expiration = min(
-            safe_expirations,
-            key=lambda exp: abs((exp - server_timestamp) - target_seconds)
-        )
-        closest_index = expirations.index(closest_expiration)
-
-        return closest_expiration, closest_index
+        return timestamps[closest_index], closest_index
 
     async def _send(self, message: Message) -> str:
         """

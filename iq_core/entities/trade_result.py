@@ -57,7 +57,7 @@ class TradeResult:
             result=TradeResultType(raw_event.get("result")),
             invest=Decimal(str(data.get("invest", "0.0"))),
             profit=Decimal(str(data.get("close_profit", "0.0"))),
-            pnl=Decimal(str(data.get("pnl", 0.0))),
+            pnl=Decimal(str(round(data.get("pnl", 0.0), 2))),
             open=float(data.get("open_quote", 0.0)),
             close=float(data.get("close_quote", 0.0)),
             open_time=int(data.get("open_time", 0)),

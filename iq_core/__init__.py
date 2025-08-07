@@ -9,7 +9,7 @@ Este pacote implementa uma arquitetura orientada ao domínio
 para um sistema de trading na IQ Option.
 """
 
-__version__ = "1.0.5"
+__version__ = "1.0.8"
 __description__ = "IQ Option API Wrapper"
 __author__ = "Célio Junior"
 

@@ -81,30 +81,32 @@ class BinaryTradeService(TradingService):
         ⚠️ Raises:
         - TradingError: Error querying trade status
         """
-        response = await self._ws.request({
-            "name": "portfolio.get-history-positions",
-            "version": "2.0",
-            "body": {
-                "user_id": self._profile.id,
-                "user_balance_id": self._profile.balance_id,
-                "instrument_types": [
-                    "turbo-option",
-                    "binary-option",
-                ],
-                "offset": 0,
-                "limit": 30,
-            },
-        })
+        try:
+            response = await self._ws.request({
+                "name": "portfolio.get-history-positions",
+                "version": "2.0",
+                "body": {
+                    "user_id": self._profile.id,
+                    "user_balance_id": self._profile.balance_id,
+                    "instrument_types": [
+                        "turbo-option",
+                        "binary-option",
+                    ],
+                    "offset": 0,
+                    "limit": 30,
+                },
+            })
 
-        if not response or "positions" not in response:
-            logger.error(f"No positions returned while querying trade status for ID {trade_id}")
+            if not response or "positions" not in response:
+                return (False, None)
+
+            positions = response["positions"]
+            position = next(
+                (p for p in positions if p.get("external_id") == int(trade_id)), None
+            )
+
+            return (
+                (False, None) if not position else (True, TradeResult.from_dict(position))
+            )
+        except (TimeoutError, Exception):
             return (False, None)
-
-        positions = response["positions"]
-        position = next(
-            (p for p in positions if p.get("external_id") == int(trade_id)), None
-        )
-
-        return (
-            (False, None) if not position else (True, TradeResult.from_dict(position))
-        )
