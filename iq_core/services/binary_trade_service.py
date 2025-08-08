@@ -29,7 +29,7 @@ class BinaryTradeService(TradingService):
 
         expiration, _ = self._ws.get_expiration(signal.expiration.minutes())
         idx = (expiration - self._ws.current_server_time(ms=False)) / 60
-        type_id = 3 if idx < 5 else 1
+        type_id = 3 if idx <= 5 else 1
 
         response = await self._ws.request({
             "name": "binary-options.open-option",

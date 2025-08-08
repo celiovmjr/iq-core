@@ -557,10 +557,12 @@ class WebSocketClient:
     def get_expiration(self, duration: int) -> tuple[int, int]:
         """
         🇧🇷 Calcula a expiração ideal para a duração informada,
-        usando o horário atual do servidor como referência.
+        replicando a lógica do painel da IQ Option e evitando
+        timestamps já indisponíveis para compra.
 
         🇺🇸 Calculates the ideal expiration for the given duration,
-        using the current server time as reference.
+        replicating IQ Option's expiration panel and avoiding
+        timestamps already closed for purchase.
 
         Args:
             duration (int): 
@@ -569,38 +571,54 @@ class WebSocketClient:
 
         Returns:
             tuple[int, int]: 
-                🇧🇷 Timestamp da expiração (em segundos) e índice na lista.  
-                🇺🇸 Expiration timestamp (epoch seconds) and index.
+                🇧🇷 Timestamp da expiração (epoch) e índice na lista.  
+                🇺🇸 Expiration timestamp (epoch) and index.
 
         Raises:
-            TradingError: 
-                🇧🇷 Se não encontrar expiração segura.  
-                🇺🇸 If no safe expiration is found.
+            TradingError:
+                🇧🇷 Se não encontrar expiração válida.  
+                🇺🇸 If no valid expiration is found.
         """
-        current_time = datetime.fromtimestamp(self.current_server_time(ms=False))
+        now = datetime.fromtimestamp(time())
         timestamps = []
 
-        if current_time.second < 30:
-            base_minute = current_time.replace(second=0, microsecond=0)
+        if now.second < 30:
+            base_minute = now.replace(second=0, microsecond=0)
         else:
-            base_minute = current_time.replace(second=0, microsecond=0) + timedelta(minutes=1)
+            base_minute = now.replace(second=0, microsecond=0) + timedelta(minutes=1)
 
         for i in range(5):
-            timestamps.append(int((base_minute + timedelta(minutes=i + 1)).timestamp()))
+            ts = int((base_minute + timedelta(minutes=i + 1)).timestamp())
+            timestamps.append(ts)
 
-        temp_date = current_time.replace(second=0, microsecond=0)
+        temp_date = now.replace(second=0, microsecond=0)
         count = 0
         while count < 50:
             temp_date += timedelta(minutes=1)
-            if temp_date.minute % 15 == 0 and (temp_date - current_time).total_seconds() > 300:
-                timestamps.append(int(temp_date.timestamp()))
+            if temp_date.minute % 15 == 0 and (temp_date - now).total_seconds() > 300:
+                ts = int(temp_date.timestamp())
+                timestamps.append(ts)
                 count += 1
-        
+
+        safe_timestamps = []
+        for ts in timestamps:
+            time_remaining = ts - time()
+
+            if (ts % 900) == 0:
+                if time_remaining >= 30:
+                    safe_timestamps.append(ts)
+            else:
+                if time_remaining >= 3:
+                    safe_timestamps.append(ts)
+
+        if not safe_timestamps:
+            raise TradingError("No safe expiration found")
+
         target_seconds = duration * 60
-        differences = [abs(t - (time() + target_seconds)) for t in timestamps]
+        differences = [abs(ts - (time() + target_seconds)) for ts in safe_timestamps]
         closest_index = differences.index(min(differences))
 
-        return timestamps[closest_index], closest_index
+        return safe_timestamps[closest_index], round(closest_index, 2)
 
     async def _send(self, message: Message) -> str:
         """
