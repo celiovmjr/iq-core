@@ -32,7 +32,7 @@ class Signal:
 
     📋 Parâmetros:
     - instrument (Instrument): Ativo a ser operado
-    - account_id (int): ID da conta que abrirá a operação
+    - balance_id (int): ID da conta que abrirá a operação
     - direction (Direction): Direção da operação (CALL ou PUT)
     - amount (Decimal): Valor investido (positivo)
     - expiration (Duration): Duração da operação (segundos ou minutos)
@@ -45,7 +45,7 @@ class Signal:
 
     📋 Parameters:
     - instrument (Instrument): Asset to be traded
-    - account_id (int): Account ID that will open the trade
+    - balance_id (int): Account ID that will open the trade
     - direction (Direction): Trade direction (CALL or PUT)
     - amount (Decimal): Investment amount (positive)
     - expiration (Duration): Trade duration (seconds or minutes)
@@ -55,7 +55,7 @@ class Signal:
     - ValueError: Invalid amount or expiration
     """
     instrument: Instrument
-    account_id: int
+    balance_id: int
     direction: Direction
     amount: Decimal
     expiration: Duration

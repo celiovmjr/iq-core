@@ -94,7 +94,7 @@ class BlitzTradeService(TradingService):
                 "name": "binary-options.open-option",
                 "version": "2.0",
                 "body": {
-                    "user_balance_id": signal.account_id,
+                    "user_balance_id": signal.balance_id,
                     "active_id": signal.instrument.id,
                     "option_type_id": 12,
                     "direction": signal.direction.value,

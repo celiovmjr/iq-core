@@ -59,7 +59,7 @@ class DigitalTradeService(TradingService):
             "name": "digital-options.place-digital-option",
             "version": "3.0",
             "body": {
-                "user_balance_id": signal.account_id,
+                "user_balance_id": signal.balance_id,
                 "instrument_id": symbol,
                 "amount": str(int(signal.amount)),
                 "instrument_index": instrument.get("index"),

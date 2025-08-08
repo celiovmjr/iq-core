@@ -35,7 +35,7 @@ class BinaryTradeService(TradingService):
             "name": "binary-options.open-option",
             "version": "1.0",
             "body": {
-                "user_balance_id": signal.account_id,
+                "user_balance_id": signal.balance_id,
                 "active_id": signal.instrument.id,
                 "option_type_id": type_id,
                 "direction": signal.direction.value,

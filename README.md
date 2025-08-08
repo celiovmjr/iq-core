@@ -135,7 +135,7 @@ async def exemplo_simples():
         # Criar sinal de trading
         signal = Signal(
             instrument=eurusd,
-            account_id=profile.balance_id,
+            balance_id=profile.balance_id,
             direction=Direction.CALL,
             amount=Decimal("10.00"),
             expiration=Duration("5m"),
@@ -173,7 +173,7 @@ async def simple_example():
         # Create trading signal
         signal = Signal(
             instrument=eurusd,
-            account_id=profile.balance_id,
+            balance_id=profile.balance_id,
             direction=Direction.CALL,
             amount=Decimal("10.00"),
             expiration=Duration("5m"),
@@ -295,7 +295,7 @@ SignalType.FOREX    # Forex
 # Criar sinal
 signal = Signal(
     instrument=instrument,
-    account_id=12345,
+    balance_id=12345,
     direction=Direction.CALL,
     amount=Decimal("25.00"),
     expiration=Duration("5m"),
@@ -465,7 +465,7 @@ async def gerenciar_contas():
         print(f"{account.type}: ${account.amount}")
     
     # Obter conta específica por ID
-    specific_account = account_service.accounts(account_id=12345)
+    specific_account = account_service.accounts(balance_id=12345)
     
     # Trocar conta ativa
     await account_service.switch_active_account(AccountType.REAL)
@@ -551,7 +551,7 @@ async def trading_binario():
     # Criar sinal
     signal = Signal(
         instrument=eurusd,
-        account_id=profile.balance_id,
+        balance_id=profile.balance_id,
         direction=Direction.CALL,
         amount=Decimal("10.00"),
         expiration=Duration("5m"),
@@ -579,7 +579,7 @@ async def trading_digital():
     
     signal = Signal(
         instrument=btc_instrument,
-        account_id=profile.balance_id,
+        balance_id=profile.balance_id,
         direction=Direction.PUT,
         amount=Decimal("25.00"),
         expiration=Duration("15m"),
@@ -608,7 +608,7 @@ async def trading_blitz():
     # Trade rápido de 30 segundos
     signal = Signal(
         instrument=gold_instrument,
-        account_id=profile.balance_id,
+        balance_id=profile.balance_id,
         direction=Direction.CALL,
         amount=Decimal("5.00"),
         expiration=Duration("30s"),
@@ -629,7 +629,7 @@ async def trading_forex():
     
     signal = Signal(
         instrument=eurusd,
-        account_id=profile.balance_id,
+        balance_id=profile.balance_id,
         direction=Direction.CALL,
         amount=Decimal("100.00"),
         expiration=Duration("1h"),
@@ -967,7 +967,7 @@ async def operacao_rede():
 - Operadores: `+`, `-`, `*`, `==`, `!=`, `<`, `<=`, `>`, `>=`
 
 #### Signal
-- `Signal(instrument, account_id, direction, amount, expiration, type)`
+- `Signal(instrument, balance_id, direction, amount, expiration, type)`
 - Validação automática de parâmetros
 - Tipos: BINARY, DIGITAL, BLITZ, FOREX
 - Direções: CALL, PUT

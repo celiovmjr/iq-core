@@ -44,28 +44,28 @@ class AccountService:
 
         self._profile.balances = [Account.from_dict(b) for b in balances]
 
-    def accounts(self, account_id: int | None = None) -> list[Account] | Account:
+    def accounts(self, balance_id: int | None = None) -> list[Account] | Account:
         """
         Returns all accounts or a specific account by ID.
         Retorna todas as contas ou uma específica pelo ID.
 
         Args:
-            account_id: Optional account ID / ID da conta (opcional)
+            balance_id: Optional account ID / ID da conta (opcional)
 
         Returns:
             List of accounts or single Account instance
 
         Raises:
-            ValueError: If account_id not found
+            ValueError: If balance_id not found
         """
-        if account_id is None:
+        if balance_id is None:
             return self._profile.balances
 
         for account in self._profile.balances:
-            if account.id == account_id:
+            if account.id == balance_id:
                 return account
 
-        raise ValueError(f"Conta com ID {account_id} não encontrada.")
+        raise ValueError(f"Conta com ID {balance_id} não encontrada.")
 
     def active_account(self) -> Account:
         """
