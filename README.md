@@ -3,7 +3,7 @@
 <div align="center">
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
-[![Version](https://img.shields.io/badge/Version-1.0.2-green.svg)](https://github.com/celiovmjr/iq-core)
+[![Version](https://img.shields.io/badge/Version-1.0.11-green.svg)](https://github.com/itmanagersupport/iq-core)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Architecture](https://img.shields.io/badge/Architecture-DDD-purple.svg)](https://en.wikipedia.org/wiki/Domain-driven_design)
 
@@ -1103,8 +1103,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## 📞 Support | Suporte
 
 - 📧 Email: profissional.celiojunior@outlook.com
-- 🐛 Issues: [GitHub Issues](https://github.com/celiovmjr/iq-core/issues)
-- 📖 Documentation: [GitHub Wiki](https://github.com/celiovmjr/iq-core/wiki)
+- 🐛 Issues: [GitHub Issues](https://github.com/itmanagersupport/iq-core/issues)
+- 📖 Documentation: [GitHub Wiki](https://github.com/itmanagersupport/iq-core/wiki)
 
 ---
 

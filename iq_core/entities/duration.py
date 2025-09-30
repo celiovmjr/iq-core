@@ -322,6 +322,48 @@ class Duration:
             return self._minutes >= float(other)
         return NotImplemented
 
+    def __mul__(self, other: Union[int, float]) -> Duration:
+        """
+        🇧🇷 Multiplica a duração por um número.
+
+        📋 Parâmetros:
+        - other (int | float): Multiplicador
+
+        📤 Retorna:
+        - Duration: Nova duração multiplicada
+
+        🇺🇸 Multiplies the duration by a number.
+
+        📋 Parameters:
+        - other (int | float): Multiplier
+
+        📤 Returns:
+        - Duration: New multiplied duration
+        """
+        if isinstance(other, (int, float)):
+            return Duration(self._minutes * float(other))
+        return NotImplemented
+
+    def __rmul__(self, other: Union[int, float]) -> Duration:
+        """
+        🇧🇷 Multiplicação reversa (número * Duration).
+
+        📋 Parâmetros:
+        - other (int | float): Multiplicador
+
+        📤 Retorna:
+        - Duration: Nova duração multiplicada
+
+        🇺🇸 Reverse multiplication (number * Duration).
+
+        📋 Parameters:
+        - other (int | float): Multiplier
+
+        📤 Returns:
+        - Duration: New multiplied duration
+        """
+        return self.__mul__(other)
+
     def __repr__(self) -> str:
         """🇧🇷 Representação amigável para debug.
 

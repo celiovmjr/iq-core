@@ -1,10 +1,12 @@
-import socket, functools
+import socket, functools, logging
 from aiohttp import (
     ClientConnectorError,
     ClientConnectorSSLError,
     ClientConnectorDNSError,
 )
 from ..exceptions import NetworkUnavailableError
+
+logger = logging.getLogger(__name__)
 
 
 def handle_network_errors(func):
@@ -13,7 +15,7 @@ def handle_network_errors(func):
         try:
             return await func(*args, **kwargs)
         except Exception as e:
-            print(f"Decorador capturou exceção: {type(e)} - {e}")
+            logger.debug(f"Network decorator caught exception: {type(e).__name__} - {e}")
             if isinstance(
                 e,
                 (
